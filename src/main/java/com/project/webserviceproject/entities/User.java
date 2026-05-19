@@ -3,27 +3,28 @@ package com.project.webserviceproject.entities;
 import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
 @Table(name = "tb_user")
-public class User implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class User{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
     private String email;
     private String phone;
     private String password;
 
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Order> orders = new ArrayList<>();
     public User(){
     }
 
-    public User(Long id, String email, String name, String phone, String password) {
+    public User(Long id, String name, String email, String phone, String password) {
         this.id = id;
         this.email = email;
         this.name = name;
@@ -34,6 +35,9 @@ public class User implements Serializable {
         return email;
     }
 
+    public List<Order> getOrders() {
+        return orders;
+    }
     public void setEmail(String email) {
         this.email = email;
     }
