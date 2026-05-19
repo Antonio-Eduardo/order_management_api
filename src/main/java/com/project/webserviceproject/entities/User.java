@@ -1,4 +1,4 @@
-package webserviceproject.entities;
+package com.project.webserviceproject.entities;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -11,15 +11,17 @@ public class User implements Serializable {
     private Long id;
     private String name;
     private String email;
-    private Long password;
+    private String phone;
+    private String password;
 
     public User(){
     }
 
-    public User(Long id, String email, String name, Long password) {
+    public User(Long id, String email, String name, String phone, String password) {
         this.id = id;
         this.email = email;
         this.name = name;
+        this.phone = phone;
         this.password = password;
     }
     public String getEmail() {
@@ -28,6 +30,14 @@ public class User implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public Long getId() {
@@ -46,11 +56,11 @@ public class User implements Serializable {
         this.name = name;
     }
 
-    public Long getPassword() {
+    public String getPassword() {
         return password;
     }
 
-    public void setPassword(Long password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 
