@@ -1,8 +1,11 @@
 package com.project.webserviceproject.resources.exceptions;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.Instant;
 
-public class StandardError extends RuntimeException {
+public class StandardError{
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss", timezone = "America/Sao_Paulo")
     private Instant timestamp;
     private Integer status;
     private String error;
@@ -25,7 +28,6 @@ public class StandardError extends RuntimeException {
         this.error = error;
     }
 
-    @Override
     public String getMessage() {
         return message;
     }
