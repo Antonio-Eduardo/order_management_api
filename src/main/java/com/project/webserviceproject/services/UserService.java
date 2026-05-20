@@ -30,14 +30,8 @@ public class UserService {
         return repository.save(obj);
     }
     public void deleteUser(Long id){
-        try {
-            repository.deleteById(id);
-        }catch (EmptyResultDataAccessException e){
-            throw new ResourceNotFoundException(id);
-        }catch (DataIntegrityViolationException e){
-            throw new DatabaseException(e.getMessage());
-        }
-
+        User userDelete = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+        repository.delete(userDelete);
     }
     public User updateUser(Long id, User obj){
 
