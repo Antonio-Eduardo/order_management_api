@@ -1,5 +1,6 @@
 package com.project.webserviceproject.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -18,6 +19,9 @@ public class Product {
     private Double price;
     private String imgUrl;
 
+    @OneToMany(mappedBy = "id.product")
+    private Set<OrderItem> items = new HashSet<>();
+
     @ManyToMany
     @JoinTable(name = "tb_product_category", joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
@@ -29,6 +33,7 @@ public class Product {
         this.price = price;
         this.description = description;
         this.imgUrl = imgUrl;
+
     }
     public Product(){}
 
@@ -76,6 +81,14 @@ public class Product {
         this.price = price;
     }
 
+    @JsonIgnore
+    public Set<Order> getOrders(){
+        Set<Order> set = new HashSet<>();
+        for (OrderItem x : items){
+            set.add(x.getOrder());
+        }
+        return set;
+    }
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Product product)) return false;
