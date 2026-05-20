@@ -86,6 +86,14 @@ public class Order {
         this.moment = moment;
     }
 
+    public Double getTotal(){
+        double soma = 0;
+        for (OrderItem x : items){
+            soma += x.getSubTotal();
+        }
+        return soma;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Order order)) return false;

@@ -17,6 +17,7 @@ public class Payment {
 
     @OneToOne
     @MapsId
+    @JsonIgnore
     private Order order;
 
     public Payment(){}
@@ -43,7 +44,6 @@ public class Payment {
         this.moment = moment;
     }
 
-    @JsonIgnore
     public Order getOrder() {
         return order;
     }
