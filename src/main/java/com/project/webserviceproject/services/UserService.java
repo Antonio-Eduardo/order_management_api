@@ -27,10 +27,14 @@ public class UserService {
         return repository.save(obj);
     }
     public void deleteUser(Long id){
-         repository.deleteById(id);
+        User user = repository.findById(id).orElseThrow(() ->new ResourceNotFoundException(id));
+
+             repository.deleteById(id);
+
     }
     public User updateUser(Long id, User obj){
-        User userfind = repository.getReferenceById(id);
+
+        User userfind = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
         updateData(userfind,obj);
         return repository.save(userfind);
 
