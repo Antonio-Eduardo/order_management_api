@@ -1,11 +1,14 @@
 package com.project.webserviceproject.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.webserviceproject.enums.OrderStatus;
 import jakarta.persistence.*;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "tb_order")
@@ -24,6 +27,9 @@ public class Order {
     @JoinColumn(name = "client_id")
     private User client;
 
+    @OneToMany(mappedBy = "id.order", cascade = CascadeType.ALL)
+    private Set<OrderItem> items = new HashSet<>();
+
     public Order(Long id, Instant moment,OrderStatus orderStatus, User client) {
         this.id = id;
         this.moment = moment;
@@ -40,6 +46,9 @@ public class Order {
         if (orderStatus != null) {
             this.orderStatus = orderStatus.getCode();
         }
+    }
+    public Set<OrderItem> getItems(){
+        return items;
     }
 
     public User getClient() {
