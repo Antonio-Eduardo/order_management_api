@@ -52,11 +52,9 @@ As principais ferramentas, linguagens e frameworks usados no desenvolvimento des
 
   ```markdown
 **No Windows:**
-```bash
 mvnw.cmd spring-boot:run
 ```
  ```markdown
 **No Linux/Mac:**
-```bash
 ./mvnw spring-boot:run
 ```
