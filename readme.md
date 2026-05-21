@@ -49,8 +49,14 @@ As principais ferramentas, linguagens e frameworks usados no desenvolvimento des
    ```bash
    cd order_management_api
 3. **Execute o projeto usando o Maven Wrapper:**
-   **No Windows:**
-   mvnw.cmd spring-boot:run
-   
-   **Linux/Mac:**
-   ./mvnw spring-boot:run
+
+  ```markdown
+**No Windows:**
+```bash
+mvnw.cmd spring-boot:run
+```
+ ```markdown
+**No Linux/Mac:**
+```bash
+./mvnw spring-boot:run
+```
