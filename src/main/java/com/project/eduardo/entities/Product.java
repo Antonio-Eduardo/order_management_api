@@ -25,7 +25,7 @@ public class Product {
     @ManyToMany
     @JoinTable(name = "tb_product_category", joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private Set<Category> categories = new HashSet<>();
+    private Set<Category> category = new HashSet<>();
 
     public Product(Long id, String name, String description,Double price, String imgUrl) {
         this.id = id;
@@ -38,7 +38,7 @@ public class Product {
     public Product(){}
 
     public Set<Category> getCategories() {
-        return categories;
+        return category;
     }
 
     public String getDescription() {
@@ -59,6 +59,10 @@ public class Product {
 
     public String getImgUrl() {
         return imgUrl;
+    }
+
+    public void setCategories(Set<Category> categories) {
+        this.category = categories;
     }
 
     public void setImgUrl(String imgUrl) {
