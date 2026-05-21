@@ -8,10 +8,10 @@
 		<version>4.0.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.project</groupId>
-	<artifactId>webserviceproject</artifactId>
+	<groupId>com.eduardo</groupId>
+	<artifactId>order-management-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
+	<name>order-management-api</name>
 	<description/>
 	<url/>
 	<licenses>
@@ -62,6 +62,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 
