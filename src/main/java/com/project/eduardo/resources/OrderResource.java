@@ -1,15 +1,17 @@
 package com.project.eduardo.resources;
 
-import com.project.eduardo.entities.Category;
+import com.project.eduardo.dto.OrderDTO;
 import com.project.eduardo.entities.Order;
+import com.project.eduardo.entities.User;
+import com.project.eduardo.enums.OrderStatus;
 import com.project.eduardo.services.OrderService;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -31,10 +33,20 @@ public class OrderResource {
         return ResponseEntity.ok().body(obj);
     }
     @PostMapping
-    public ResponseEntity<Order> inserCategory(@RequestBody Order obj){
-        obj = service.orderInsert(obj);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj).toUri();
-        return ResponseEntity.created(uri).body(obj);
-    }
+    public ResponseEntity<Order> inserCategory(@RequestBody OrderDTO orderDTO){
+        Order order = new Order();
+        order.setOrderStatus(OrderStatus.valueOf(orderDTO.getOrderStatusId()));
+        order.setMoment(Instant.now());
 
+        Order save = service.orderInsert(order, orderDTO.getClientId());
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(save).toUri();
+        return ResponseEntity.created(uri).body(save);
+    }
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<Order> updateUser(@PathVariable Long id, @RequestBody OrderDTO orderDTO){
+
+         Order orderUpdate = service.updateOrder(orderDTO,id);
+
+        return ResponseEntity.ok().body(orderUpdate);
+    }
 }

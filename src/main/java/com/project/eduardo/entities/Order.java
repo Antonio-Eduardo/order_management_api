@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.project.eduardo.enums.OrderStatus;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Objects;
@@ -34,7 +35,7 @@ public class Order {
 
     public Order(Long id, Instant moment,OrderStatus orderStatus, User client) {
         this.id = id;
-        this.moment = moment;
+        this.moment = Instant.now();
         setOrderStatus(orderStatus);
         this.client = client;
     }
@@ -85,13 +86,14 @@ public class Order {
         this.moment = moment;
     }
 
-    public Double getTotal(){
-        double soma = 0;
+    public BigDecimal getTotal(){
+        BigDecimal soma = BigDecimal.ZERO;
         for (OrderItem x : items){
-            soma += x.getSubTotal();
+            soma = soma.add(x.getSubTotal());
         }
         return soma;
     }
+
 
     @Override
     public boolean equals(Object o) {

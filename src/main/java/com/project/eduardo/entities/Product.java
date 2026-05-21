@@ -3,6 +3,7 @@ package com.project.eduardo.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -16,7 +17,7 @@ public class Product {
     private Long id;
     private String name;
     private String description;
-    private Double price;
+    private BigDecimal price;
     private String imgUrl;
 
     @OneToMany(mappedBy = "id.product")
@@ -25,9 +26,9 @@ public class Product {
     @ManyToMany
     @JoinTable(name = "tb_product_category", joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private Set<Category> category = new HashSet<>();
+    private Set<Category> categories = new HashSet<>();
 
-    public Product(Long id, String name, String description,Double price, String imgUrl) {
+    public Product(Long id, String name, String description,BigDecimal price, String imgUrl) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -38,7 +39,7 @@ public class Product {
     public Product(){}
 
     public Set<Category> getCategories() {
-        return category;
+        return categories;
     }
 
     public String getDescription() {
@@ -62,7 +63,7 @@ public class Product {
     }
 
     public void setCategories(Set<Category> categories) {
-        this.category = categories;
+        this.categories = categories;
     }
 
     public void setImgUrl(String imgUrl) {
@@ -77,11 +78,11 @@ public class Product {
         this.name = name;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

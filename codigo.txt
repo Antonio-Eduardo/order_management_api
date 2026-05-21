@@ -1,0 +1,1374 @@
+package com.project.eduardo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class WebserviceprojectApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(WebserviceprojectApplication.class, args);
+	}
+
+}
+package com.project.eduardo.config;
+
+import com.project.eduardo.entities.*;
+import com.project.eduardo.enums.OrderStatus;
+import com.project.eduardo.repositories.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.Arrays;
+
+@Configuration
+@Profile("test")
+public class TestConfig implements CommandLineRunner {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private OrderItemRepository orderItemRepository;
+
+    @Override
+    public void run(String... args) throws Exception {
+
+        Category cat1 = new Category(null, "Electronics");
+        Category cat2 = new Category(null, "Books");
+        Category cat3 = new Category(null, "Computers");
+        Product p1 = new Product(null, "The Lord of the Rings", "Lorem ipsum dolor sit amet, consectetur.", BigDecimal.valueOf(90.5), "");
+        Product p2 = new Product(null, "Smart TV", "Nulla eu imperdiet purus. Maecenas ante.", BigDecimal.valueOf(2190.0), "");
+        Product p3 = new Product(null, "Macbook Pro", "Nam eleifend maximus tortor, at mollis.",BigDecimal.valueOf(1250.0), "");
+        Product p4 = new Product(null, "PC Gamer", "Donec aliquet odio ac rhoncus cursus.",  BigDecimal.valueOf(1200.0),"");
+        Product p5 = new Product(null, "Rails for Dummies", "Cras fringilla convallis sem vel faucibus.",BigDecimal.valueOf(100.99), "");
+
+        categoryRepository.saveAll(Arrays.asList(cat1,cat2,cat3));
+        productRepository.saveAll(Arrays.asList(p1,p2,p3,p4,p5));
+
+        p1.getCategories().add(cat2);
+        p2.getCategories().add(cat1);
+        p2.getCategories().add(cat3);
+        p3.getCategories().add(cat3);
+        p3.getCategories().add(cat1);
+        p4.getCategories().add(cat3);
+        p4.getCategories().add(cat1);
+        p5.getCategories().add(cat2);
+
+        productRepository.saveAll(Arrays.asList(p1,p2,p3,p4,p5));
+
+        User u1 = new User(null, "Markin", "markin@gmail.com", "988888888", "123456");
+        User u2 = new User(null, "java da silva", "javasilva@gmail.com", "977777777", "123456");
+        User u3 = new User(null, "Spring moreira", "spmra@gmail.com", "97123137", "123456");
+        Order o1 = new Order(null, Instant.parse("2019-06-20T19:53:07Z"), OrderStatus.WAITING_PAYMENT, u1);
+        Order o2 = new Order(null, Instant.parse("2019-07-21T03:42:10Z"), OrderStatus.PAID, u2);
+        Order o3 = new Order(null, Instant.parse("2019-07-22T15:21:22Z"), OrderStatus.WAITING_PAYMENT, u3);
+
+        userRepository.saveAll(Arrays.asList(u1,u2,u3));
+        orderRepository.saveAll(Arrays.asList(o1,o2,o3));
+
+        OrderItem oi1 = new OrderItem(o1, p1, 2, p1.getPrice());
+        OrderItem oi2 = new OrderItem(o1, p3, 1, p3.getPrice());
+        OrderItem oi3 = new OrderItem(o2, p3, 2, p3.getPrice());
+        OrderItem oi4 = new OrderItem(o3, p5, 2, p5.getPrice());
+
+        orderItemRepository.saveAll(Arrays.asList(oi1,oi2,oi3,oi4));
+
+        Payment pay1 = new Payment(null,Instant.parse("2019-06-20T19:53:07Z"), o2);
+        o2.setPayment(pay1);
+
+        orderRepository.save(o2);
+
+    }
+}
+package com.project.eduardo.dto;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.project.eduardo.entities.OrderItem;
+
+import java.util.HashSet;
+import java.util.Set;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class OrderDTO {
+    private Long clientId;
+    private int orderStatusId;
+    private Set<OrderItem> items = new HashSet<>();
+
+    public Long getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(Long clientId) {
+        this.clientId = clientId;
+    }
+
+    public Integer getOrderStatusId() {
+        return orderStatusId;
+    }
+
+    public void setOrderStatusId(Integer orderStatusId) {
+        this.orderStatusId = orderStatusId;
+    }
+
+    public Set<OrderItem> getItems() {
+        return items;
+    }
+
+    public void setItems(Set<OrderItem> items) {
+        this.items = items;
+    }
+}
+package com.project.eduardo.dto;
+
+public class OrderItemDTO {
+    private Long productId;
+    private Long orderId;
+    private Integer quantity;
+
+
+    public Long getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+}
+package com.project.eduardo.entities;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
+import java.util.*;
+
+@Entity
+@Table(name = "tb_category")
+public class Category {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "categories")
+    private Set<Product> products = new HashSet<>();
+
+    public Category(){}
+
+    public Category(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setProducts(Set<Product> products) {
+        this.products = products;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Category category)) return false;
+        return Objects.equals(id, category.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+}
+package com.project.eduardo.entities;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.project.eduardo.enums.OrderStatus;
+import jakarta.persistence.*;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+@Entity
+@Table(name = "tb_order")
+public class Order {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss", timezone = "America/Sao_Paulo")
+    private Instant moment;
+
+    private Integer orderStatus;
+
+    @ManyToOne
+    @JoinColumn(name = "client_id")
+    private User client;
+
+    @OneToMany(mappedBy = "id.order", cascade = CascadeType.ALL)
+    private Set<OrderItem> items = new HashSet<>();
+
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    private Payment payment;
+
+    public Order(Long id, Instant moment,OrderStatus orderStatus, User client) {
+        this.id = id;
+        this.moment = moment;
+        setOrderStatus(orderStatus);
+        this.client = client;
+    }
+    public Order(){}
+
+    public OrderStatus getOrderStatus() {
+        return OrderStatus.valueOf(orderStatus);
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        if (orderStatus != null) {
+            this.orderStatus = orderStatus.getCode();
+        }
+    }
+    public Set<OrderItem> getItems(){
+        return items;
+    }
+
+    public User getClient() {
+        return client;
+    }
+
+    public void setClient(User client) {
+        this.client = client;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Instant getMoment() {
+        return moment;
+    }
+
+    public void setMoment(Instant moment) {
+        this.moment = moment;
+    }
+
+    public BigDecimal getTotal(){
+        BigDecimal soma = BigDecimal.ZERO;
+        for (OrderItem x : items){
+            soma = soma.add(x.getSubTotal());
+        }
+        return soma;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Order order)) return false;
+        return Objects.equals(id, order.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+}
+package com.project.eduardo.entities;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.project.eduardo.entities.pk.OrderItemPK;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+import java.math.BigDecimal;
+import java.util.Objects;
+@Entity
+@Table(name = "tb_order_item")
+public class OrderItem {
+
+    @EmbeddedId
+    private OrderItemPK id = new OrderItemPK();
+
+    Integer quantity;
+    BigDecimal price;
+
+    public OrderItem(){}
+
+    public OrderItem(Order order, Product product, Integer quantity, BigDecimal price) {
+        id.setOrder(order);
+        id.setProduct(product);
+        this.quantity = quantity;
+        this.price = price;
+    }
+
+    @JsonIgnore
+    public Order getOrder(){
+        return id.getOrder();
+    }
+    public void setOrder(Order order){
+        id.setOrder(order);
+    }
+
+    public BigDecimal getSubTotal(){
+        return price.multiply(BigDecimal.valueOf(quantity));
+    }
+    public Product getProduct(){
+        return id.getProduct();
+    }
+    public void setProduct(Product product){
+        id.setProduct(product);
+    }
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof OrderItem orderItem)) return false;
+        return Objects.equals(id, orderItem.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+}
+
+package com.project.eduardo.entities;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
+import java.time.Instant;
+import java.util.Objects;
+
+@Entity
+@Table(name = "tb_payment")
+public class Payment {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private Instant moment;
+
+    @OneToOne
+    @MapsId
+    @JsonIgnore
+    private Order order;
+
+    public Payment(){}
+
+    public Payment(Long id, Instant moment, Order order) {
+        this.id = id;
+        this.moment = moment;
+        this.order = order;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Instant getMoment() {
+        return moment;
+    }
+
+    public void setMoment(Instant moment) {
+        this.moment = moment;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Payment payment)) return false;
+        return Objects.equals(id, payment.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+}
+package com.project.eduardo.entities;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
+import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+@Entity
+@Table(name = "tb_product")
+public class Product {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    private String description;
+    private BigDecimal price;
+    private String imgUrl;
+
+    @OneToMany(mappedBy = "id.product")
+    private Set<OrderItem> items = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "tb_product_category", joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private Set<Category> categories = new HashSet<>();
+
+    public Product(Long id, String name, String description,BigDecimal price, String imgUrl) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.description = description;
+        this.imgUrl = imgUrl;
+
+    }
+    public Product(){}
+
+    public Set<Category> getCategories() {
+        return categories;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setCategories(Set<Category> categories) {
+        this.categories = categories;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    @JsonIgnore
+    public Set<Order> getOrders(){
+        Set<Order> set = new HashSet<>();
+        for (OrderItem x : items){
+            set.add(x.getOrder());
+        }
+        return set;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Product product)) return false;
+        return Objects.equals(id, product.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+}
+
+package com.project.eduardo.entities;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+@Entity
+@Table(name = "tb_user")
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    private String email;
+    private String phone;
+    private String password;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Order> orders = new ArrayList<>();
+    public User(){
+    }
+
+    public User(Long id, String name, String email, String phone, String password) {
+        this.id = id;
+        this.email = email;
+        this.name = name;
+        this.phone = phone;
+        this.password = password;
+    }
+    public String getEmail() {
+        return email;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof User user)) return false;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+}
+package com.project.eduardo.entities.pk;
+
+import com.project.eduardo.entities.Order;
+import com.project.eduardo.entities.Product;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+
+import java.util.Objects;
+
+@Embeddable
+public class OrderItemPK {
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
+
+    public OrderItemPK(){}
+
+    public OrderItemPK(Order order, Product product) {
+        this.order = order;
+        this.product = product;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof OrderItemPK that)) return false;
+        return Objects.equals(order, that.order) && Objects.equals(product, that.product);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(order, product);
+    }
+}
+package com.project.eduardo.enums;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+public enum OrderStatus {
+    WAITING_PAYMENT(1),
+    PAID(2),
+    SHIPPED(3),
+    DELIVERED(4),
+    CANCELED(5);
+
+    private int code;
+
+    private OrderStatus(int code){
+        this.code=code;
+    }
+    @JsonValue
+    public int getCode(){
+        return code;
+    }
+
+    @JsonCreator
+    public static OrderStatus valueOf(int code){
+        for (OrderStatus value : OrderStatus.values()){
+            if (value.getCode() == code){
+                return value;
+            }
+        }
+        throw new IllegalArgumentException("codigo invalido");
+    }
+}
+package com.project.eduardo.repositories;
+
+import com.project.eduardo.entities.Category;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface CategoryRepository extends JpaRepository<Category,Long> {
+}
+package com.project.eduardo.repositories;
+
+import com.project.eduardo.entities.OrderItem;
+import com.project.eduardo.entities.pk.OrderItemPK;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface OrderItemRepository extends JpaRepository<OrderItem, OrderItemPK> {
+}
+package com.project.eduardo.repositories;
+
+import com.project.eduardo.entities.Order;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface OrderRepository extends JpaRepository<Order,Long> {
+}
+package com.project.eduardo.repositories;
+
+import com.project.eduardo.entities.Product;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ProductRepository extends JpaRepository<Product,Long> {
+}
+package com.project.eduardo.repositories;
+
+import com.project.eduardo.entities.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserRepository extends JpaRepository<User,Long> {
+}
+package com.project.eduardo.resources;
+
+import com.project.eduardo.entities.Category;
+import com.project.eduardo.services.CategoryService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+import java.util.List;
+
+@RestController
+@RequestMapping(value = "/category")
+public class CategoryResource {
+
+    @Autowired
+    private CategoryService service;
+
+    @GetMapping
+    public ResponseEntity<List<Category>> findAll(){
+        List<Category> list = service.findAll();
+        return ResponseEntity.ok().body(list);
+    }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<Category> findById(@PathVariable Long id){
+        Category obj = service.FindById(id);
+        return ResponseEntity.ok().body(obj);
+    }
+    @PostMapping
+    public ResponseEntity<Category> insertCategory(@RequestBody Category obj){
+        obj = service.insertCategory(obj);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
+        return ResponseEntity.created(uri).body(obj);
+    }
+}
+package com.project.eduardo.resources;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@Controller
+public class HomeController {
+
+    @GetMapping
+    public ResponseEntity<Map<String, Object>> direcionamento() {
+        Map<String, Object> resposta = new HashMap<>();
+        resposta.put("mensagem", "Bem-vindo a API de Gerenciamento de Pedidos");
+        resposta.put("status", "Online");
+
+        Map<String, String> endpoints = new HashMap<>();
+        endpoints.put("usuarios", "/users");
+        endpoints.put("produtos", "/product");
+        endpoints.put("categorias", "/category");
+        endpoints.put("pedidos", "/orders");
+
+        resposta.put("endpoints_disponiveis", endpoints);
+
+        return ResponseEntity.ok().body(resposta);
+    }
+}
+package com.project.eduardo.resources;
+
+import com.project.eduardo.dto.OrderItemDTO;
+import com.project.eduardo.entities.Order;
+import com.project.eduardo.entities.OrderItem;
+import com.project.eduardo.entities.Product;
+import com.project.eduardo.services.OrderItemService;
+import com.project.eduardo.services.OrderService;
+import com.project.eduardo.services.ProductService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.math.BigDecimal;
+import java.net.URI;
+import java.util.List;
+
+@RestController
+@RequestMapping("/order-item")
+public class OrderItemResource {
+
+    @Autowired
+    OrderItemService service;
+
+    @Autowired
+    ProductService productService;
+
+    @Autowired
+    OrderService orderService;
+
+    @GetMapping
+    public ResponseEntity<List<OrderItem>> getOrderItems(){
+        return ResponseEntity.ok().body(service.getOrderItems());
+    }
+    @GetMapping(value = "/order-items/{orderId}/{productId}")
+    public ResponseEntity<OrderItem> findById(
+            @PathVariable Long order,
+            @PathVariable Long product) {
+
+        OrderItem obj = service.FindById(order,product);
+
+        return ResponseEntity.ok().body(obj);
+    }
+
+    @PostMapping
+    public ResponseEntity<OrderItem> insertOrderItem(@RequestBody OrderItemDTO orderItemDTO){
+        Product product = productService.FindById(orderItemDTO.getProductId());
+        Order order = orderService.FindById(orderItemDTO.getOrderId());
+        BigDecimal price = product.getPrice();
+        Integer quantity = orderItemDTO.getQuantity();
+        OrderItem orderItem = new OrderItem(order,product,quantity,price);
+        order.getItems().add(orderItem);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(orderItem).toUri();
+        return ResponseEntity.created(uri).body(orderItem);
+    }
+
+}
+package com.project.eduardo.resources;
+
+import com.project.eduardo.dto.OrderDTO;
+import com.project.eduardo.entities.Order;
+import com.project.eduardo.entities.User;
+import com.project.eduardo.enums.OrderStatus;
+import com.project.eduardo.services.OrderService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+import java.util.List;
+
+@RestController
+@RequestMapping(value = "/orders")
+public class OrderResource {
+
+    @Autowired
+    private OrderService service;
+
+    @GetMapping
+    public ResponseEntity<List<Order>> findAll(){
+        List<Order> list = service.findAll();
+        return ResponseEntity.ok().body(list);
+    }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<Order> findById(@PathVariable Long id){
+        Order obj = service.FindById(id);
+        return ResponseEntity.ok().body(obj);
+    }
+    @PostMapping
+    public ResponseEntity<Order> inserCategory(@RequestBody OrderDTO orderDTO){
+        Order order = new Order();
+        order.setOrderStatus(OrderStatus.valueOf(orderDTO.getOrderStatusId()));
+
+        Order save = service.orderInsert(order, orderDTO.getClientId());
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(save).toUri();
+        return ResponseEntity.created(uri).body(save);
+    }
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<Order> updateUser(@PathVariable Long id, @RequestBody OrderDTO orderDTO){
+
+         Order orderUpdate = service.updateOrder(orderDTO,id);
+
+         Order updatedOrder = service.updateOrder(orderDTO,id);
+
+        return ResponseEntity.ok().body(orderUpdate);
+    }
+}
+package com.project.eduardo.resources;
+
+import com.project.eduardo.entities.Product;
+import com.project.eduardo.services.ProductService;
+import jakarta.servlet.Servlet;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+import java.util.List;
+
+@RestController
+@RequestMapping(value = "/product")
+public class ProductResource {
+
+    @Autowired
+    private ProductService service;
+
+    @GetMapping
+    public ResponseEntity<List<Product>> findAll(){
+        List<Product> list = service.findAll();
+        return ResponseEntity.ok().body(list);
+    }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<Product> findById(@PathVariable Long id){
+        Product obj = service.FindById(id);
+        return ResponseEntity.ok().body(obj);
+    }
+    @PostMapping
+    public ResponseEntity<Product> insertProduto(@RequestBody Product obj){
+        obj = service.inserProduct(obj);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
+        return ResponseEntity.created(uri).body(obj);
+    }
+}
+package com.project.eduardo.resources;
+
+import com.project.eduardo.entities.User;
+import com.project.eduardo.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping(value = "/users")
+public class UserResource {
+
+    @Autowired
+    private UserService service;
+
+    @GetMapping
+    public ResponseEntity<List<User>> findAll() {
+        List<User> list = service.findAll();
+        return ResponseEntity.ok().body(list);
+    }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<User> findById(@PathVariable Long id) {
+        User obj = service.FindById(id);
+        return ResponseEntity.ok().body(obj);
+    }
+
+    @PostMapping
+    public ResponseEntity<User> insertUser(@RequestBody User obj) {
+        obj = service.insertUser(obj);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
+        return ResponseEntity.created(uri).body(obj);
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id){
+        service.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User obj){
+        obj = service.updateUser(id,obj);
+        return ResponseEntity.ok().body(obj);
+    }
+}
+package com.project.eduardo.resources.exceptions;
+
+import com.project.eduardo.services.exceptions.ResourceNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.time.Instant;
+
+@ControllerAdvice
+public class ResourceExceptionHandler{
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<StandardError> resourceNotFound(ResourceNotFoundException e, HttpServletRequest request){
+        String error = "Resource not found";
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        StandardError standardError = new StandardError(Instant.now(),status.value(), error, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(standardError);
+    }
+}
+package com.project.eduardo.resources.exceptions;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.time.Instant;
+
+public class StandardError{
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss", timezone = "America/Sao_Paulo")
+    private Instant timestamp;
+    private Integer status;
+    private String error;
+    private String message;
+    private String path;
+
+    public StandardError( Instant timestamp, Integer status, String error,String message, String path) {
+        this.error = error;
+        this.message = message;
+        this.path = path;
+        this.status = status;
+        this.timestamp = timestamp;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Instant getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Instant timestamp) {
+        this.timestamp = timestamp;
+    }
+}
+package com.project.eduardo.services;
+
+import com.project.eduardo.entities.Category;
+import com.project.eduardo.repositories.CategoryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class CategoryService {
+
+    @Autowired
+    private CategoryRepository repository;
+
+    public List<Category> findAll(){
+        return repository.findAll();
+    }
+
+    public Category FindById(Long id){
+        Optional<Category> obj = repository.findById(id);
+        return obj.get();
+    }
+    public Category insertCategory(Category obj){
+        return repository.save(obj);
+    }
+}
+package com.project.eduardo.services;
+
+import com.project.eduardo.entities.Order;
+import com.project.eduardo.entities.OrderItem;
+import com.project.eduardo.entities.Product;
+import com.project.eduardo.entities.pk.OrderItemPK;
+import com.project.eduardo.repositories.OrderItemRepository;
+import com.project.eduardo.repositories.OrderRepository;
+import com.project.eduardo.repositories.ProductRepository;
+import com.project.eduardo.services.exceptions.ResourceNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class OrderItemService {
+
+    @Autowired
+    OrderItemRepository orderItemRepository;
+
+    @Autowired
+    OrderRepository orderRepository;
+
+    @Autowired
+    ProductRepository productRepository;
+
+    public OrderItem inserOrderItem(OrderItem oi){
+        oi.getOrder().getItems().add(oi);
+        orderRepository.save(oi.getOrder());
+        return orderItemRepository.save(oi);
+    }
+
+    public List<OrderItem> getOrderItems(){
+        return orderItemRepository.findAll();
+    }
+
+    public OrderItem FindById(Long orderId, Long productId){
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException(orderId));
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException(productId));
+        OrderItemPK orderItemPK = new OrderItemPK(order,product);
+
+        return orderItemRepository.findById(orderItemPK).orElseThrow(() -> new ResourceNotFoundException(orderItemPK));
+
+    }
+}
+package com.project.eduardo.services;
+
+import com.project.eduardo.dto.OrderDTO;
+import com.project.eduardo.entities.Order;
+import com.project.eduardo.entities.OrderItem;
+import com.project.eduardo.entities.User;
+import com.project.eduardo.repositories.OrderRepository;
+import com.project.eduardo.repositories.UserRepository;
+import com.project.eduardo.services.exceptions.ResourceNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+@Service
+public class OrderService {
+
+    @Autowired
+    private OrderRepository repository;
+    @Autowired
+    private UserRepository userRepository;
+
+    public List<Order> findAll(){
+        return repository.findAll();
+    }
+    public Order FindById(Long id){
+        return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+    }
+    public Order orderInsert(Order obj, Long clientId){
+        User client = userRepository.findById(clientId).orElseThrow(() -> new ResourceNotFoundException(clientId));
+
+        obj.setClient(client);
+        return repository.save(obj);
+    }
+    public void updateData(Order orderfind, OrderDTO orderDTO ){
+        orderfind.getItems().clear();
+        for (OrderItem item : orderDTO.getItems()) {
+            item.setOrder(orderfind);
+            orderfind.getItems().add(item);
+        }
+        orderfind.getTotal();
+
+    }
+    public Order updateOrder(OrderDTO orderDTO, Long id){
+        Order orderfind = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+        updateData(orderfind,orderDTO);
+        return repository.save(orderfind);
+    }
+}
+package com.project.eduardo.services;
+
+import com.project.eduardo.entities.Category;
+import com.project.eduardo.entities.Product;
+import com.project.eduardo.repositories.CategoryRepository;
+import com.project.eduardo.repositories.ProductRepository;
+import com.project.eduardo.services.exceptions.ResourceNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Service
+public class ProductService {
+
+    @Autowired
+    private ProductRepository repository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    public List<Product> findAll(){
+        return repository.findAll();
+    }
+
+    public Product FindById(Long id){
+        Optional<Product> obj = repository.findById(id);
+        return obj.get();
+    }
+
+    public Product inserProduct(Product obj){
+        Set<Category> category = obj.getCategories().stream()
+                .map(cat -> categoryRepository
+                .findById(cat.getId())
+                .orElseThrow(() -> new ResourceNotFoundException(cat.getId())))
+                .collect(Collectors.toSet());
+
+        obj.setCategories(category);
+
+       return repository.save(obj);
+    }
+}
+package com.project.eduardo.services;
+
+import com.project.eduardo.entities.User;
+import com.project.eduardo.repositories.UserRepository;
+import com.project.eduardo.services.exceptions.ResourceNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class UserService {
+
+    @Autowired
+    private UserRepository repository;
+
+    public List<User> findAll(){
+        return repository.findAll();
+    }
+
+    public User FindById(Long id){
+        Optional<User> obj = repository.findById(id);
+        return obj.orElseThrow(() -> new ResourceNotFoundException(id));
+    }
+
+    public User insertUser(User obj){
+        return repository.save(obj);
+    }
+    public void deleteUser(Long id){
+        User userDelete = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+        repository.delete(userDelete);
+    }
+    public User updateUser(Long id, User obj){
+
+        User userfind = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+        updateData(userfind,obj);
+        return repository.save(userfind);
+
+    }
+    private void updateData(User userfind, User obj) {
+        userfind.setName(obj.getName());
+        userfind.setEmail(obj.getEmail());
+        userfind.setPhone(obj.getPhone());
+    }
+}
+package com.project.eduardo.services.exceptions;
+
+public class ResourceNotFoundException extends RuntimeException {
+    public ResourceNotFoundException(Object id) {
+        super("Resource not found. Id " + id);
+    }
+}
+package com.project.eduardo;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class ordermanagementApplicationTest {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
