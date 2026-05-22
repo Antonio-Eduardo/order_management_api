@@ -40,7 +40,7 @@ A **Order Management API** é uma aplicação backend com API REST e persistênc
 - **Java** (JDK 17+)
 - **Spring Boot** (Spring Web, Spring Data JPA)
 - **JPA / Hibernate**
-- **MySQL** (ambiente local) / **PostgreSQL** (produção)
+- **PostgreSQL**
 - **Postman** (validação e testes dos endpoints)
 - **Heroku** (deploy e hospedagem)
 - **Maven**
