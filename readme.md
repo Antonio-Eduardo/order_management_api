@@ -1,8 +1,8 @@
 # Order Management API
 
 ![Status do Projeto](https://img.shields.io/badge/status-production-brightgreen)
-![Java](https://img.shields.io/badge/Java-17-orange)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen)
+![Java](https://img.shields.io/badge/Java-25-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.6-brightgreen)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)
 [![Deploy](https://img.shields.io/badge/Heroku-online-blueviolet)](https://order-management-api-d85bb0aa85e8.herokuapp.com/users)
 [![Licença MIT](https://img.shields.io/badge/licenca-MIT-green)](https://github.com/Antonio-Eduardo/order_management_api/blob/master/LICENSE)
@@ -37,10 +37,11 @@ O projeto explora mapeamento ORM com relacionamentos `@OneToMany`, `@ManyToOne` 
 
 | Tecnologia | Uso |
 |---|---|
-| Java 17 | Linguagem principal |
-| Spring Boot | Framework principal |
+| Java 25 | Linguagem principal |
+| Spring Boot 4.0.6 | Framework principal |
 | Spring Data JPA / Hibernate | Persistência e mapeamento ORM |
-| PostgreSQL | Banco de dados (dev e produção) |
+| H2 | Banco de dados em memória (perfil test) |
+| PostgreSQL | Banco de dados em produção |
 | Heroku | Deploy e hospedagem |
 | Maven | Gerenciamento de dependências |
 
@@ -112,8 +113,7 @@ Content-Type: application/json
 
 ### Pré-requisitos
 
-- Java 17+
-- PostgreSQL rodando localmente
+- Java 25+
 - Maven
 
 ```bash
@@ -121,26 +121,17 @@ git clone https://github.com/Antonio-Eduardo/order_management_api.git
 cd order_management_api
 ```
 
-Configure o `application.properties`:
-
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/order_management
-spring.datasource.username=postgres
-spring.datasource.password=suasenha
-spring.jpa.hibernate.ddl-auto=update
-```
-
 ```bash
 ./mvnw spring-boot:run
 ```
 
-A API estará disponível em `http://localhost:8080`.
+A aplicação sobe com perfil `test` usando H2 em memória — sem necessidade de banco externo. A API estará disponível em `http://localhost:8080` e o console H2 em `http://localhost:8080/h2-console`.
 
 ---
 
 ## Decisões Técnicas
 
-**PostgreSQL em dev e produção:** A decisão de usar PostgreSQL no ambiente de desenvolvimento — em vez de H2 — garantiu que incompatibilidades de SQL fossem capturadas antes do deploy, não depois.
+**H2 em dev, PostgreSQL em produção:** O projeto usa H2 em memória no perfil de testes para agilizar o desenvolvimento local sem dependência de banco externo. Em produção no Heroku, o PostgreSQL é injetado automaticamente via variável de ambiente.
 
 **Cálculo de subtotal na entidade:** O `getSubTotal()` foi implementado como método calculado na entidade em vez de campo persistido, evitando inconsistências quando o preço do produto é atualizado após o pedido ser criado.
 
