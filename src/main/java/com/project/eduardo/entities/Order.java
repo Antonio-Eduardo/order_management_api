@@ -1,17 +1,20 @@
 package com.project.eduardo.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.project.eduardo.enums.OrderStatus;
 import jakarta.persistence.*;
-
-import java.math.BigDecimal;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.time.Instant;
 import java.util.HashSet;
-import java.util.Objects;
+
 import java.util.Set;
 
 @Entity
 @Table(name = "tb_order")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Order {
 
     @Id
@@ -33,76 +36,5 @@ public class Order {
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
     private Payment payment;
 
-    public Order(Long id, Instant moment,OrderStatus orderStatus, User client) {
-        this.id = id;
-        this.moment = Instant.now();
-        setOrderStatus(orderStatus);
-        this.client = client;
-    }
-    public Order(){}
 
-    public OrderStatus getOrderStatus() {
-        return OrderStatus.valueOf(orderStatus);
-    }
-
-    public Payment getPayment() {
-        return payment;
-    }
-
-    public void setPayment(Payment payment) {
-        this.payment = payment;
-    }
-
-    public void setOrderStatus(OrderStatus orderStatus) {
-        if (orderStatus != null) {
-            this.orderStatus = orderStatus.getCode();
-        }
-    }
-    public Set<OrderItem> getItems(){
-        return items;
-    }
-
-    public User getClient() {
-        return client;
-    }
-
-    public void setClient(User client) {
-        this.client = client;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Instant getMoment() {
-        return moment;
-    }
-
-    public void setMoment(Instant moment) {
-        this.moment = moment;
-    }
-
-    public BigDecimal getTotal(){
-        BigDecimal soma = BigDecimal.ZERO;
-        for (OrderItem x : items){
-            soma = soma.add(x.getSubTotal());
-        }
-        return soma;
-    }
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Order order)) return false;
-        return Objects.equals(id, order.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
 }

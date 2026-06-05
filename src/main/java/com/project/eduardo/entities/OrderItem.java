@@ -1,15 +1,20 @@
 package com.project.eduardo.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.eduardo.entities.pk.OrderItemPK;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.Objects;
+
 @Entity
 @Table(name = "tb_order_item")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class OrderItem {
 
     @EmbeddedId
@@ -18,57 +23,6 @@ public class OrderItem {
     Integer quantity;
     BigDecimal price;
 
-    public OrderItem(){}
 
-    public OrderItem(Order order, Product product, Integer quantity, BigDecimal price) {
-        id.setOrder(order);
-        id.setProduct(product);
-        this.quantity = quantity;
-        this.price = price;
-    }
-
-    @JsonIgnore
-    public Order getOrder(){
-        return id.getOrder();
-    }
-    public void setOrder(Order order){
-        id.setOrder(order);
-    }
-
-    public BigDecimal getSubTotal(){
-        return price.multiply(BigDecimal.valueOf(quantity));
-    }
-    public Product getProduct(){
-        return id.getProduct();
-    }
-    public void setProduct(Product product){
-        id.setProduct(product);
-    }
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof OrderItem orderItem)) return false;
-        return Objects.equals(id, orderItem.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
 }
 
