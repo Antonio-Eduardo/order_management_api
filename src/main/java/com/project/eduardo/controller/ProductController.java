@@ -1,8 +1,7 @@
-package com.project.eduardo.resources;
+package com.project.eduardo.controller;
 
 import com.project.eduardo.entities.Product;
 import com.project.eduardo.services.ProductService;
-import jakarta.servlet.Servlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/product")
-public class ProductResource {
+public class ProductController {
 
     @Autowired
     private ProductService service;

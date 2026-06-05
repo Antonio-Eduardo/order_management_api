@@ -1,6 +1,6 @@
-package com.project.eduardo.resources;
+package com.project.eduardo.controller;
 
-import com.project.eduardo.dto.OrderItemDTO;
+import com.project.eduardo.dto.baseDTO.OrderItemDTO;
 import com.project.eduardo.entities.Order;
 import com.project.eduardo.entities.OrderItem;
 import com.project.eduardo.entities.Product;
@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/order-item")
-public class OrderItemResource {
+public class OrderItemController {
 
     @Autowired
     OrderItemService service;
@@ -42,7 +42,6 @@ public class OrderItemResource {
 
         return ResponseEntity.ok().body(obj);
     }
-
     @PostMapping
     public ResponseEntity<OrderItem> insertOrderItem(@RequestBody OrderItemDTO orderItemDTO){
         Product product = productService.FindById(orderItemDTO.getProductId());
@@ -58,5 +57,4 @@ public class OrderItemResource {
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(orderItem).toUri();
         return ResponseEntity.created(uri).body(orderItem);
     }
-
 }

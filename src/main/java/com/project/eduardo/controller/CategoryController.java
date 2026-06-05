@@ -1,4 +1,4 @@
-package com.project.eduardo.resources;
+package com.project.eduardo.controller;
 
 import com.project.eduardo.entities.Category;
 import com.project.eduardo.services.CategoryService;
@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/category")
-public class CategoryResource {
+public class CategoryController {
 
     @Autowired
     private CategoryService service;

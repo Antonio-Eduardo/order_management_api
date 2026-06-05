@@ -1,4 +1,4 @@
-package com.project.eduardo.dto;
+package com.project.eduardo.dto.baseDTO;
 
 import lombok.Data;
 

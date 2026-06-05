@@ -1,4 +1,4 @@
-package com.project.eduardo.resources.exceptions;
+package com.project.eduardo.controller.exceptions;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

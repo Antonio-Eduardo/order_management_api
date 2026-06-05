@@ -28,5 +28,5 @@ public class User {
     @JsonIgnore
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders = new ArrayList<>();
-    
+
 }

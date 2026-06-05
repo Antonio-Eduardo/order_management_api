@@ -1,8 +1,7 @@
-package com.project.eduardo.resources;
+package com.project.eduardo.controller;
 
-import com.project.eduardo.dto.OrderDTO;
+import com.project.eduardo.dto.request.OrderDTOrequest;
 import com.project.eduardo.entities.Order;
-import com.project.eduardo.entities.User;
 import com.project.eduardo.enums.OrderStatus;
 import com.project.eduardo.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/orders")
-public class OrderResource {
+public class OrderController {
 
     @Autowired
     private OrderService service;
@@ -33,7 +32,7 @@ public class OrderResource {
         return ResponseEntity.ok().body(obj);
     }
     @PostMapping
-    public ResponseEntity<Order> inserCategory(@RequestBody OrderDTO orderDTO){
+    public ResponseEntity<Order> inserCategory(@RequestBody OrderDTOrequest orderDTO){
         Order order = new Order();
         order.setOrderStatus(OrderStatus.valueOf(orderDTO.getOrderStatusId()));
         order.setMoment(Instant.now());
@@ -43,7 +42,7 @@ public class OrderResource {
         return ResponseEntity.created(uri).body(save);
     }
     @PutMapping(value = "/{id}")
-    public ResponseEntity<Order> updateUser(@PathVariable Long id, @RequestBody OrderDTO orderDTO){
+    public ResponseEntity<Order> updateUser(@PathVariable Long id, @RequestBody OrderDTOrequest orderDTO){
 
          Order orderUpdate = service.updateOrder(orderDTO,id);
 
