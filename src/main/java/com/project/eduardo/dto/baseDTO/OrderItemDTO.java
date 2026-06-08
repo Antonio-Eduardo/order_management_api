@@ -2,9 +2,12 @@ package com.project.eduardo.dto.baseDTO;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class OrderItemDTO {
-    private Long productId;
-    private Long orderId;
-    private Integer quantity;
+    public Long productId;
+    public Long orderId;
+    public BigDecimal price;
+    public Integer quantity;
 }
