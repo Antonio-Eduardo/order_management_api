@@ -1,5 +1,7 @@
 package com.project.eduardo.services;
 
+import com.project.eduardo.dto.request.UserDTOrequest;
+import com.project.eduardo.dto.response.UserDTOresponse;
 import com.project.eduardo.entities.User;
 import com.project.eduardo.repositories.UserRepository;
 import com.project.eduardo.services.exceptions.ResourceNotFoundException;
@@ -18,28 +20,56 @@ public class UserService {
         return repository.findAll();
     }
 
-    public User FindById(Long id){
-        Optional<User> obj = repository.findById(id);
-        return obj.orElseThrow(() -> new ResourceNotFoundException(id));
+    public UserDTOresponse FindById(Long id){
+        User user = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario não encontrado! ID:" + id));
+        UserDTOresponse response = new UserDTOresponse();
+        response.setName(user.getName());
+        response.setPhone(user.getPhone());
+        response.setEmail(user.getEmail());
+        response.setId(user.getId());
+        return response;
     }
 
-    public User insertUser(User obj){
-        return repository.save(obj);
+    public UserDTOresponse insertUser(UserDTOrequest obj){
+        User user = new User();
+        user.setName(obj.getName());
+        user.setEmail(obj.getEmail());
+        user.setPhone(obj.getPhone());
+
+        User usersaved = repository.save(user);
+
+        UserDTOresponse response = new UserDTOresponse();
+        response.setName(usersaved.getName());
+        response.setEmail(usersaved.getEmail());
+        response.setPhone(usersaved.getPhone());
+        response.setId(usersaved.getId());
+        return response;
     }
     public void deleteUser(Long id){
         User userDelete = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
         repository.delete(userDelete);
     }
-    public User updateUser(Long id, User obj){
-
+    public UserDTOresponse updateUser(Long id, UserDTOrequest obj){
         User userfind = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
         updateData(userfind,obj);
-        return repository.save(userfind);
+        User userSaved = repository.save(userfind);
+        UserDTOresponse response = new UserDTOresponse();
+        response.setId(userSaved.getId());
+        response.setName(userSaved.getName());
+        response.setEmail(userSaved.getEmail());
+        response.setPhone(userSaved.getPhone());
+        return response;
 
     }
-    private void updateData(User userfind, User obj) {
-        userfind.setName(obj.getName());
-        userfind.setEmail(obj.getEmail());
-        userfind.setPhone(obj.getPhone());
+    private void updateData(User userfind, UserDTOrequest obj) {
+        if (obj.getName() != null) {
+            userfind.setName(obj.getName());
+        }
+        if (obj.getEmail() != null) {
+            userfind.setEmail(obj.getEmail());
+        }
+        if (obj.getPhone() != null) {
+            userfind.setPhone(obj.getPhone());
+        }
     }
 }
