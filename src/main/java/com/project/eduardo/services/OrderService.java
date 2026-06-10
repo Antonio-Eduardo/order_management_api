@@ -59,7 +59,8 @@ public class OrderService {
         return response;
     }
     public OrderDTOresponse orderInsert(OrderDTOrequest obj, Long clientId){
-        User client = userRepository.findById(clientId).orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado ! ID:" + clientId));
+        User client = userRepository.findById(clientId).orElseThrow(() ->
+                new ResourceNotFoundException("Cliente não encontrado ! ID:" + clientId));
 
         Order newOrder = new Order();
         newOrder.setOrderStatus(OrderStatus.valueOf(obj.getOrderStatus()));

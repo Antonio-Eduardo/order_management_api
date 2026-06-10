@@ -1,5 +1,6 @@
 package com.project.eduardo.services;
 
+import com.project.eduardo.dto.response.OrderItemDTOresponse;
 import com.project.eduardo.entities.Order;
 import com.project.eduardo.entities.OrderItem;
 import com.project.eduardo.entities.Product;
@@ -26,22 +27,25 @@ public class OrderItemService {
     @Autowired
     ProductRepository productRepository;
 
-    public OrderItem inserOrderItem(OrderItem oi){
-        oi.getOrder().getItems().add(oi);
-        orderRepository.save(oi.getOrder());
-        return orderItemRepository.save(oi);
-    }
-
     public List<OrderItem> getOrderItems(){
         return orderItemRepository.findAll();
     }
+    public OrderItemDTOresponse FindById(Long orderId, Long productId){
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Order não encontrada! ID:"+orderId));
 
-    public OrderItem FindById(Long orderId, Long productId){
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException(orderId));
-        Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException(productId));
-        OrderItemPK orderItemPK = new OrderItemPK(order,product);
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado! ID:" +productId));
 
-        return orderItemRepository.findById(orderItemPK).orElseThrow(() -> new ResourceNotFoundException(orderItemPK));
+        OrderItemPK pk = new OrderItemPK(order,product);
+
+       OrderItem orderItemFind = orderItemRepository.findById(pk).orElseThrow(() -> new ResourceNotFoundException("Order item não encontrado! ID:" + pk));
+
+        OrderItemDTOresponse response = new OrderItemDTOresponse();
+        response.setOrderId(orderItemFind.getOrder().getId());
+        response.setProductId(orderItemFind.getProduct().getId());
+        response.setQuantity(orderItemFind.getQuantity());
+        response.setPrice(orderItemFind.getPrice());
+
+        return response;
 
     }
 }
