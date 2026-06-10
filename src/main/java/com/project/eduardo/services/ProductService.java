@@ -1,6 +1,11 @@
 package com.project.eduardo.services;
 
+import com.project.eduardo.dto.baseDTO.OrderItemDTO;
+import com.project.eduardo.dto.request.ProductDTOrequest;
+import com.project.eduardo.dto.response.CategoryDTOresponse;
+import com.project.eduardo.dto.response.ProductDTOresponse;
 import com.project.eduardo.entities.Category;
+import com.project.eduardo.entities.OrderItem;
 import com.project.eduardo.entities.Product;
 import com.project.eduardo.repositories.CategoryRepository;
 import com.project.eduardo.repositories.ProductRepository;
@@ -27,20 +32,71 @@ public class ProductService {
         return repository.findAll();
     }
 
-    public Product FindById(Long id){
-        Optional<Product> obj = repository.findById(id);
-        return obj.get();
+    public ProductDTOresponse FindById(Long id){
+        Product produto = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(
+                "Produto não encontrado! ID:" + id));
+        ProductDTOresponse response = new ProductDTOresponse();
+        response.setId(produto.getId());
+        response.setName(produto.getName());
+        response.setPrice(produto.getPrice());
+        response.setDescription(produto.getDescription());
+        response.setImgUrl(produto.getImgUrl());
+
+        response.setCategories(produto.getCategories().stream().map(category -> {
+            CategoryDTOresponse categoryDTOresponse = new CategoryDTOresponse();
+            categoryDTOresponse.setId(category.getId());
+            categoryDTOresponse.setName(category.getName());
+            return categoryDTOresponse;
+
+        }).collect(Collectors.toSet()));
+        response.setItems(produto.getItems().stream().map(orderItem -> {
+            OrderItemDTO orderItemDTO = new OrderItemDTO();
+            orderItemDTO.setProductId(orderItem.getProduct().getId());
+            orderItemDTO.setOrderId(orderItem.getOrder().getId());
+            orderItemDTO.setPrice(orderItem.getPrice());
+            orderItemDTO.setQuantity(orderItem.getQuantity());
+            return orderItemDTO;
+        }).collect(Collectors.toSet()));
+
+        return response;
     }
 
-    public Product inserProduct(Product obj){
-        Set<Category> category = obj.getCategories().stream()
-                .map(cat -> categoryRepository
-                .findById(cat.getId())
-                .orElseThrow(() -> new ResourceNotFoundException(cat.getId())))
-                .collect(Collectors.toSet());
+    public ProductDTOresponse inserProduct(ProductDTOrequest obj){
+        Product product = new Product();
+        product.setName(obj.getName());
+        product.setPrice(obj.getPrice());
+        product.setDescription(obj.getDescription());
+        product.setImgUrl(obj.getImgURL());
+        product.setItems(obj.getItems().stream().map(orderItemDTO -> {
+            OrderItem orderItem = new OrderItem();
+            orderItem.setPrice(orderItemDTO.getPrice());
+            orderItem.setQuantity(orderItemDTO.getQuantity());
+            orderItem.setProduct(product);
 
-        obj.setCategories(category);
+            return orderItem;
+        }).collect(Collectors.toSet()));
+        product.setCategories(obj.getCategories().stream().map(categoryDTOresponse -> {
+            Category category = new Category();
+            category.setName(categoryDTOresponse.getName());
+            category.setId(categoryDTOresponse.getId());
+            return category;
+        }).collect(Collectors.toSet()));
 
-       return repository.save(obj);
+        Product savedProduct = repository.save(product);
+        ProductDTOresponse response = new ProductDTOresponse();
+        response.setId(savedProduct.getId());
+        response.setName(savedProduct.getName());
+        response.setPrice(savedProduct.getPrice());
+        response.setDescription(savedProduct.getDescription());
+        response.setImgUrl(savedProduct.getImgUrl());
+        response.setItems(obj.getItems());
+        response.setCategories(savedProduct.getCategories().stream().map(category -> {
+            CategoryDTOresponse dt0response = new CategoryDTOresponse();
+            dt0response.setName(category.getName());
+            dt0response.setId(category.getId());
+            return dt0response;
+        }).collect(Collectors.toSet()));
+        
+       return response;
     }
 }
