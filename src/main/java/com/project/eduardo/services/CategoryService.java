@@ -30,10 +30,10 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryDTOresponse insertCategory(Category obj) {
-        CategoryDTOrequest request = new CategoryDTOrequest();
-        request.setName(obj.getName());
-        Category saved = repository.save(obj);
+    public CategoryDTOresponse insertCategory(CategoryDTOrequest obj) {
+        Category category = new Category();
+        category.setName(obj.getName());
+        Category saved = repository.save(category);
         CategoryDTOresponse response = new CategoryDTOresponse();
         response.setName(saved.getName());
         response.setId(saved.getId());

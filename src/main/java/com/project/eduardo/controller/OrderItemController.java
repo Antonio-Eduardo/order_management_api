@@ -1,9 +1,11 @@
 package com.project.eduardo.controller;
 
 import com.project.eduardo.dto.request.OrderItemDTOrequest;
+import com.project.eduardo.dto.response.OrderItemDTOresponse;
 import com.project.eduardo.entities.Order;
 import com.project.eduardo.entities.OrderItem;
 import com.project.eduardo.entities.Product;
+import com.project.eduardo.entities.pk.OrderItemPK;
 import com.project.eduardo.services.OrderItemService;
 import com.project.eduardo.services.OrderService;
 import com.project.eduardo.services.ProductService;
@@ -34,27 +36,11 @@ public class OrderItemController {
         return ResponseEntity.ok().body(service.getOrderItems());
     }
     @GetMapping(value = "/order-items/{orderId}/{productId}")
-    public ResponseEntity<OrderItem> findById(
+    public ResponseEntity<OrderItemDTOresponse> findById(
             @PathVariable Long order,
             @PathVariable Long product) {
+        OrderItemDTOresponse response = service.FindById(order,product);
 
-        OrderItem obj = service.FindById(order,product);
-
-        return ResponseEntity.ok().body(obj);
-    }
-    @PostMapping
-    public ResponseEntity<OrderItem> insertOrderItem(@RequestBody OrderItemDTOrequest orderItemDTO){
-        Product product = productService.FindById(orderItemDTO.getProductId());
-        Order order = orderService.FindById(orderItemDTO.getOrderId());
-
-        BigDecimal price = product.getPrice();
-        Integer quantity = orderItemDTO.getQuantity();
-
-        OrderItem orderItem = new OrderItem(order,product,quantity,price);
-
-        order.getItems().add(orderItem);
-
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(orderItem).toUri();
-        return ResponseEntity.created(uri).body(orderItem);
+        return ResponseEntity.ok().body(response);
     }
 }

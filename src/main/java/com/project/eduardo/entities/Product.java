@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -26,9 +27,11 @@ public class Product {
     private String imgUrl;
 
     @OneToMany(mappedBy = "id.product")
+    @ToString.Exclude
     private Set<OrderItem> items = new HashSet<>();
 
     @ManyToMany
+    @ToString.Exclude
     @JoinTable(name = "tb_product_category", joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<Category> categories = new HashSet<>();

@@ -1,6 +1,7 @@
 package com.project.eduardo.controller;
 
 import com.project.eduardo.dto.request.OrderDTOrequest;
+import com.project.eduardo.dto.response.OrderDTOresponse;
 import com.project.eduardo.entities.Order;
 import com.project.eduardo.enums.OrderStatus;
 import com.project.eduardo.services.OrderService;
@@ -25,27 +26,15 @@ public class OrderController {
         List<Order> list = service.findAll();
         return ResponseEntity.ok().body(list);
     }
-
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Order> findById(@PathVariable Long id){
-        Order obj = service.FindById(id);
+    public ResponseEntity<OrderDTOresponse> findById(@PathVariable Long id){
+        OrderDTOresponse obj = service.FindById(id);
         return ResponseEntity.ok().body(obj);
     }
-    @PostMapping
-    public ResponseEntity<Order> inserCategory(@RequestBody OrderDTOrequest orderDTO){
-        Order order = new Order();
-        order.setOrderStatus(OrderStatus.valueOf(orderDTO.getOrderStatusId()));
-        order.setMoment(Instant.now());
-
-        Order save = service.orderInsert(order, orderDTO.getClientId());
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(save).toUri();
-        return ResponseEntity.created(uri).body(save);
-    }
-    @PutMapping(value = "/{id}")
-    public ResponseEntity<Order> updateUser(@PathVariable Long id, @RequestBody OrderDTOrequest orderDTO){
-
-         Order orderUpdate = service.updateOrder(orderDTO,id);
-
-        return ResponseEntity.ok().body(orderUpdate);
+    @PostMapping(value = "/insert/{id}")
+    public ResponseEntity<OrderDTOresponse> inserCategory(@RequestBody OrderDTOrequest orderDTO, @PathVariable Long id) {
+        OrderDTOresponse response = service.orderInsert(orderDTO, id);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.getId()).toUri();
+        return ResponseEntity.created(uri).body(response);
     }
 }

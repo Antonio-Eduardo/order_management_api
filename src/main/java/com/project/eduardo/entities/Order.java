@@ -6,11 +6,11 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -24,7 +24,6 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss", timezone = "America/Sao_Paulo")
     private Instant moment;
 
     private Integer orderStatus;
@@ -33,6 +32,7 @@ public class Order {
     @JoinColumn(name = "client_id")
     private User client;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "id.order", cascade = CascadeType.ALL)
     private Set<OrderItem> items = new HashSet<>();
 
@@ -55,16 +55,5 @@ public class Order {
             soma = soma.add(x.getSubTotal());
         }
         return soma;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Order order)) return false;
-        return Objects.equals(id, order.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
     }
 }

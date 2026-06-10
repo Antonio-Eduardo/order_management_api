@@ -1,5 +1,7 @@
 package com.project.eduardo.controller;
 
+import com.project.eduardo.dto.request.UserDTOrequest;
+import com.project.eduardo.dto.response.UserDTOresponse;
 import com.project.eduardo.entities.User;
 import com.project.eduardo.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,16 +26,16 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<User> findById(@PathVariable Long id) {
-        User obj = service.FindById(id);
+    public ResponseEntity<UserDTOresponse> findById(@PathVariable Long id) {
+        UserDTOresponse obj = service.FindById(id);
         return ResponseEntity.ok().body(obj);
     }
 
     @PostMapping
-    public ResponseEntity<User> insertUser(@RequestBody User obj) {
-        obj = service.insertUser(obj);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
-        return ResponseEntity.created(uri).body(obj);
+    public ResponseEntity<UserDTOresponse> insertUser(@RequestBody UserDTOrequest obj) {
+        UserDTOresponse response = service.insertUser(obj);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.getId()).toUri();
+        return ResponseEntity.created(uri).body(response);
     }
 
     @DeleteMapping(value = "/{id}")
@@ -42,8 +44,8 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
     @PutMapping(value = "/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User obj){
-        obj = service.updateUser(id,obj);
-        return ResponseEntity.ok().body(obj);
+    public ResponseEntity<UserDTOresponse> updateUser(@PathVariable Long id, @RequestBody UserDTOrequest obj){
+        UserDTOresponse response = service.updateUser(id,obj);
+        return ResponseEntity.ok().body(response);
     }
 }

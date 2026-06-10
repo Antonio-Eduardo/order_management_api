@@ -1,5 +1,7 @@
 package com.project.eduardo.controller;
 
+import com.project.eduardo.dto.request.ProductDTOrequest;
+import com.project.eduardo.dto.response.ProductDTOresponse;
 import com.project.eduardo.entities.Product;
 import com.project.eduardo.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +26,14 @@ public class ProductController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Product> findById(@PathVariable Long id){
-        Product obj = service.FindById(id);
+    public ResponseEntity<ProductDTOresponse> findById(@PathVariable Long id){
+        ProductDTOresponse obj = service.FindById(id);
         return ResponseEntity.ok().body(obj);
     }
     @PostMapping
-    public ResponseEntity<Product> insertProduto(@RequestBody Product obj){
-        obj = service.inserProduct(obj);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
-        return ResponseEntity.created(uri).body(obj);
+    public ResponseEntity<ProductDTOresponse> insertProduto(@RequestBody ProductDTOrequest obj){
+        ProductDTOresponse response = service.inserProduct(obj);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.getId()).toUri();
+        return ResponseEntity.created(uri).body(response);
     }
 }

@@ -38,10 +38,6 @@ public class OrderItem {
     }
 
 
-    public void setOrder(Order order){
-        id.setOrder(order);
-    }
-
     public BigDecimal getSubTotal(){
         return price.multiply(BigDecimal.valueOf(quantity));
     }
