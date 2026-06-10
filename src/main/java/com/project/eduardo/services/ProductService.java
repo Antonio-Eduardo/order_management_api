@@ -1,11 +1,11 @@
 package com.project.eduardo.services;
 
-import com.project.eduardo.dto.baseDTO.OrderItemDTO;
+import com.project.eduardo.dto.request.OrderItemDTOrequest;
 import com.project.eduardo.dto.request.ProductDTOrequest;
 import com.project.eduardo.dto.response.CategoryDTOresponse;
+import com.project.eduardo.dto.response.OrderItemDTOresponse;
 import com.project.eduardo.dto.response.ProductDTOresponse;
 import com.project.eduardo.entities.Category;
-import com.project.eduardo.entities.OrderItem;
 import com.project.eduardo.entities.Product;
 import com.project.eduardo.repositories.CategoryRepository;
 import com.project.eduardo.repositories.ProductRepository;
@@ -13,10 +13,7 @@ import com.project.eduardo.services.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,15 +46,6 @@ public class ProductService {
             return categoryDTOresponse;
 
         }).collect(Collectors.toSet()));
-        response.setItems(produto.getItems().stream().map(orderItem -> {
-            OrderItemDTO orderItemDTO = new OrderItemDTO();
-            orderItemDTO.setProductId(orderItem.getProduct().getId());
-            orderItemDTO.setOrderId(orderItem.getOrder().getId());
-            orderItemDTO.setPrice(orderItem.getPrice());
-            orderItemDTO.setQuantity(orderItem.getQuantity());
-            return orderItemDTO;
-        }).collect(Collectors.toSet()));
-
         return response;
     }
 
@@ -67,14 +55,6 @@ public class ProductService {
         product.setPrice(obj.getPrice());
         product.setDescription(obj.getDescription());
         product.setImgUrl(obj.getImgURL());
-        product.setItems(obj.getItems().stream().map(orderItemDTO -> {
-            OrderItem orderItem = new OrderItem();
-            orderItem.setPrice(orderItemDTO.getPrice());
-            orderItem.setQuantity(orderItemDTO.getQuantity());
-            orderItem.setProduct(product);
-
-            return orderItem;
-        }).collect(Collectors.toSet()));
         product.setCategories(obj.getCategories().stream().map(categoryDTOresponse -> {
             Category category = new Category();
             category.setName(categoryDTOresponse.getName());
@@ -89,14 +69,13 @@ public class ProductService {
         response.setPrice(savedProduct.getPrice());
         response.setDescription(savedProduct.getDescription());
         response.setImgUrl(savedProduct.getImgUrl());
-        response.setItems(obj.getItems());
         response.setCategories(savedProduct.getCategories().stream().map(category -> {
             CategoryDTOresponse dt0response = new CategoryDTOresponse();
             dt0response.setName(category.getName());
             dt0response.setId(category.getId());
             return dt0response;
         }).collect(Collectors.toSet()));
-        
+
        return response;
     }
 }

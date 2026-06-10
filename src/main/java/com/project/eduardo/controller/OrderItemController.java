@@ -1,6 +1,6 @@
 package com.project.eduardo.controller;
 
-import com.project.eduardo.dto.baseDTO.OrderItemDTO;
+import com.project.eduardo.dto.request.OrderItemDTOrequest;
 import com.project.eduardo.entities.Order;
 import com.project.eduardo.entities.OrderItem;
 import com.project.eduardo.entities.Product;
@@ -43,7 +43,7 @@ public class OrderItemController {
         return ResponseEntity.ok().body(obj);
     }
     @PostMapping
-    public ResponseEntity<OrderItem> insertOrderItem(@RequestBody OrderItemDTO orderItemDTO){
+    public ResponseEntity<OrderItem> insertOrderItem(@RequestBody OrderItemDTOrequest orderItemDTO){
         Product product = productService.FindById(orderItemDTO.getProductId());
         Order order = orderService.FindById(orderItemDTO.getOrderId());
 

@@ -1,7 +1,5 @@
 package com.project.eduardo.dto.response;
 
-import com.project.eduardo.dto.baseDTO.OrderItemDTO;
-import com.project.eduardo.dto.request.CategoryDTOrequest;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -16,6 +14,5 @@ public class ProductDTOresponse {
     public String description;
     public BigDecimal price;
     public String imgUrl;
-    public Set<OrderItemDTO> items = new HashSet<>();
     public Set<CategoryDTOresponse> categories = new HashSet<>();
 }

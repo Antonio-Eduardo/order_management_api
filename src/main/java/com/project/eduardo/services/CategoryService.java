@@ -1,20 +1,15 @@
 package com.project.eduardo.services;
 
-import com.project.eduardo.dto.baseDTO.OrderItemDTO;
 import com.project.eduardo.dto.request.CategoryDTOrequest;
 import com.project.eduardo.dto.response.CategoryDTOresponse;
-import com.project.eduardo.dto.response.ProductDTOresponse;
 import com.project.eduardo.entities.Category;
 import com.project.eduardo.repositories.CategoryRepository;
 import com.project.eduardo.services.exceptions.ResourceNotFoundException;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {

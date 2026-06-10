@@ -1,6 +1,6 @@
 package com.project.eduardo.dto.response;
 
-import com.project.eduardo.dto.baseDTO.OrderItemDTO;
+import com.project.eduardo.dto.request.OrderItemDTOrequest;
 import lombok.Data;
 
 import java.time.Instant;
@@ -14,5 +14,5 @@ public class OrderDTOresponse {
     public Instant moment;
     public Integer orderStatus;
     public UserDTOresponse client;
-    private Set<OrderItemDTO> items = new HashSet<>();
+    private Set<OrderItemDTOresponse> items = new HashSet<>();
 }
