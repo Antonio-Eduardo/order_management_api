@@ -30,7 +30,7 @@ public class ProductController {
         ProductDTOresponse obj = service.FindById(id);
         return ResponseEntity.ok().body(obj);
     }
-    @PostMapping
+    @PostMapping(value = "/insert")
     public ResponseEntity<ProductDTOresponse> insertProduto(@RequestBody ProductDTOrequest obj){
         ProductDTOresponse response = service.inserProduct(obj);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.getId()).toUri();

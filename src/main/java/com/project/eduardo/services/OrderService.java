@@ -16,6 +16,7 @@ import com.project.eduardo.repositories.UserRepository;
 import com.project.eduardo.services.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -58,6 +59,7 @@ public class OrderService {
         }).collect(Collectors.toSet()));
         return response;
     }
+    @Transactional
     public OrderDTOresponse orderInsert(OrderDTOrequest obj, Long clientId){
         User client = userRepository.findById(clientId).orElseThrow(() ->
                 new ResourceNotFoundException("Cliente não encontrado ! ID:" + clientId));
@@ -70,6 +72,7 @@ public class OrderService {
         newOrder.setItems(obj.getItems().stream().map(orderItemDTO -> {
             Product productFind = productRepository.findById(orderItemDTO.getProductId()).orElseThrow(() ->
                     new ResourceNotFoundException("Produto não encontrado ! ID:" + orderItemDTO.getProductId()));
+
             return new OrderItem(newOrder, productFind, orderItemDTO.quantity, productFind.getPrice());
         }).collect(Collectors.toSet()));
 

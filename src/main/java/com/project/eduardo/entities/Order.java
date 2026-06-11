@@ -1,12 +1,10 @@
 package com.project.eduardo.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.eduardo.enums.OrderStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -33,6 +31,8 @@ public class Order {
     private User client;
 
     @ToString.Exclude
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "id.order", cascade = CascadeType.ALL)
     private Set<OrderItem> items = new HashSet<>();
 

@@ -7,6 +7,8 @@ import com.project.eduardo.repositories.UserRepository;
 import com.project.eduardo.services.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -30,11 +32,13 @@ public class UserService {
         return response;
     }
 
+    @Transactional
     public UserDTOresponse insertUser(UserDTOrequest obj){
         User user = new User();
         user.setName(obj.getName());
         user.setEmail(obj.getEmail());
         user.setPhone(obj.getPhone());
+        user.setPassword(obj.getPassword());
 
         User usersaved = repository.save(user);
 
@@ -49,6 +53,7 @@ public class UserService {
         User userDelete = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
         repository.delete(userDelete);
     }
+    @Transactional
     public UserDTOresponse updateUser(Long id, UserDTOrequest obj){
         User userfind = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
         updateData(userfind,obj);

@@ -41,6 +41,7 @@ public class OrderItem {
     public BigDecimal getSubTotal(){
         return price.multiply(BigDecimal.valueOf(quantity));
     }
+    @JsonIgnore
     public Product getProduct(){
         return id.getProduct();
     }

@@ -30,7 +30,7 @@ public class CategoryController {
         CategoryDTOresponse response = service.FindById(id);
         return ResponseEntity.ok().body(response);
     }
-    @PostMapping
+    @PostMapping(value = "/insert")
     public ResponseEntity<CategoryDTOresponse> insertCategory(@RequestBody CategoryDTOrequest obj){
         CategoryDTOresponse response = service.insertCategory(obj);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.getId()).toUri();

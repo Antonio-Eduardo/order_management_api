@@ -2,10 +2,7 @@ package com.project.eduardo.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -27,10 +24,14 @@ public class Product {
     private String imgUrl;
 
     @OneToMany(mappedBy = "id.product")
+    @JsonIgnore
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<OrderItem> items = new HashSet<>();
 
     @ManyToMany
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @JoinTable(name = "tb_product_category", joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))

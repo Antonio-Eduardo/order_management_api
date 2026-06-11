@@ -12,6 +12,7 @@ import com.project.eduardo.repositories.ProductRepository;
 import com.project.eduardo.services.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,17 +50,17 @@ public class ProductService {
         return response;
     }
 
+    @Transactional
     public ProductDTOresponse inserProduct(ProductDTOrequest obj){
         Product product = new Product();
         product.setName(obj.getName());
         product.setPrice(obj.getPrice());
         product.setDescription(obj.getDescription());
-        product.setImgUrl(obj.getImgURL());
-        product.setCategories(obj.getCategories().stream().map(categoryDTOresponse -> {
+        product.setImgUrl(obj.get());
+        product.setCategories(obj.getCategories().stream().map(categoryDTOrequest -> {
             Category category = new Category();
-            category.setName(categoryDTOresponse.getName());
-            category.setId(categoryDTOresponse.getId());
-            return category;
+            category.setName(categoryDTOrequest.getName());
+            return categoryRepository.save(category);
         }).collect(Collectors.toSet()));
 
         Product savedProduct = repository.save(product);

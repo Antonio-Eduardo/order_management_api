@@ -12,6 +12,6 @@ public class ProductDTOrequest {
     public String name;
     public String description;
     public BigDecimal price;
-    public String imgURL;
-    public Set<CategoryDTOresponse> categories = new HashSet<>();
+    public String imgUrl;
+    public Set<CategoryDTOrequest> categories = new HashSet<>();
 }

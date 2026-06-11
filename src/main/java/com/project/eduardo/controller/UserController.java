@@ -31,7 +31,7 @@ public class UserController {
         return ResponseEntity.ok().body(obj);
     }
 
-    @PostMapping
+    @PostMapping(value = "/insert")
     public ResponseEntity<UserDTOresponse> insertUser(@RequestBody UserDTOrequest obj) {
         UserDTOresponse response = service.insertUser(obj);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.getId()).toUri();
