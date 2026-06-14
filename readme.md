@@ -4,12 +4,12 @@
 ![Java](https://img.shields.io/badge/Java-25-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.6-brightgreen)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)
-[![Deploy](https://img.shields.io/badge/Heroku-online-blueviolet)](https://order-management-api-d85bb0aa85e8.herokuapp.com/users)
+[![Deploy](https://img.shields.io/badge/Railway-online-blueviolet)](https://ordermanagementapi-production.up.railway.app/swagger-ui/index.html)
 [![Licença MIT](https://img.shields.io/badge/licenca-MIT-green)](https://github.com/Antonio-Eduardo/order_management_api/blob/master/LICENSE)
 
-> API REST para gerenciamento de usuários e controle de pedidos com cálculo automático de subtotal e total. Deploy ativo no Heroku com banco PostgreSQL em produção.
+> API REST para gerenciamento de usuários e controle de pedidos com cálculo automático de subtotal e total. Deploy ativo no Railway com banco PostgreSQL em produção.
 
-**[→ API em produção](https://order-management-api-d85bb0aa85e8.herokuapp.com/users)**
+**[→ API em produção](https://ordermanagementapi-production.up.railway.app/swagger-ui/index.html)**
 
 ---
 
@@ -27,9 +27,9 @@
 
 ## Sobre o Projeto
 
-A **Order Management API** é uma API REST desenvolvida com Spring Boot para gerenciamento de usuários e pedidos. O sistema modela 4 entidades relacionadas — `User`, `Orders`, `OrderItem` e `Product` — com cálculo automático de subtotal por item e total por pedido.
+A **Order Management API** é uma API REST desenvolvida com Spring Boot para gerenciamento de usuários e pedidos. O sistema modela 5 entidades relacionadas — `User`, `Orders`, `OrderItem`, `Product` e `Category` — com cálculo automático de subtotal por item e total por pedido.
 
-O projeto explora mapeamento ORM com relacionamentos `@OneToMany`, `@ManyToOne` e `@ManyToMany` entre entidades, com foco em baixo acoplamento e separação de responsabilidades entre controllers, services e repositories.
+O projeto explora mapeamento ORM com relacionamentos `@OneToMany`, `@ManyToOne` e `@ManyToMany` entre entidades, com foco em baixo acoplamento e separação de responsabilidades entre controllers, services e repositories. A documentação interativa está disponível via Swagger/OpenAPI.
 
 ---
 
@@ -40,9 +40,10 @@ O projeto explora mapeamento ORM com relacionamentos `@OneToMany`, `@ManyToOne` 
 | Java 25 | Linguagem principal |
 | Spring Boot 4.0.6 | Framework principal |
 | Spring Data JPA / Hibernate | Persistência e mapeamento ORM |
+| SpringDoc OpenAPI (Swagger) | Documentação interativa da API |
 | H2 | Banco de dados em memória (perfil test) |
 | PostgreSQL | Banco de dados em produção |
-| Heroku | Deploy e hospedagem |
+| Railway | Deploy e hospedagem |
 | Maven | Gerenciamento de dependências |
 
 ---
@@ -51,12 +52,17 @@ O projeto explora mapeamento ORM com relacionamentos `@OneToMany`, `@ManyToOne` 
 
 ```
 User (1) ──── (N) Orders (1) ──── (N) OrderItem (N) ──── (1) Product
+                                                                 │
+                                                         (N) ───┤
+                                                                 │
+                                                           Category (N)
 ```
 
-- **User** — dados do cliente (nome, email, telefone, endereço)
+- **User** — dados do cliente (nome, email, telefone, senha)
 - **Orders** — pedido vinculado a um usuário, com status e total calculado
 - **OrderItem** — item do pedido com quantidade, preço unitário e subtotal automático
-- **Product** — catálogo de produtos com nome, descrição e preço
+- **Product** — catálogo de produtos com nome, descrição, preço e imagem
+- **Category** — categorias associadas aos produtos via `@ManyToMany`
 - **Payment** — entidade criada, integração em desenvolvimento
 
 **Cálculo automático:**
@@ -67,7 +73,9 @@ User (1) ──── (N) Orders (1) ──── (N) OrderItem (N) ────
 
 ## Endpoints Disponíveis
 
-> Base URL em produção: `https://order-management-api-d85bb0aa85e8.herokuapp.com`
+> Base URL em produção: `https://ordermanagementapi-production.up.railway.app`
+>
+> Documentação interativa: [/swagger-ui/index.html](https://ordermanagementapi-production.up.railway.app/swagger-ui/index.html)
 
 ### Usuários — `/users`
 
@@ -75,13 +83,13 @@ User (1) ──── (N) Orders (1) ──── (N) OrderItem (N) ────
 |---|---|---|
 | GET | `/users` | Lista todos os usuários |
 | GET | `/users/{id}` | Busca usuário por ID |
-| POST | `/users` | Cria novo usuário |
+| POST | `/users/insert` | Cria novo usuário |
 | PUT | `/users/{id}` | Atualiza usuário |
-| DELETE | `/users/{id}` | Remove usuário |
+| DELETE | `/users/delete/{id}` | Remove usuário |
 
 **Exemplo:**
 ```http
-POST /users
+POST /users/insert
 Content-Type: application/json
 
 {
@@ -98,14 +106,43 @@ Content-Type: application/json
 |---|---|---|
 | GET | `/orders` | Lista todos os pedidos |
 | GET | `/orders/{id}` | Busca pedido por ID com total calculado |
+| POST | `/orders/insert/{id}` | Cria pedido para o usuário com o ID informado |
 
-### Produtos — `/products`
+**Exemplo:**
+```http
+POST /orders/insert/1
+Content-Type: application/json
+
+{
+  "orderStatus": 1,
+  "items": [
+    { "productId": 2, "quantity": 3 }
+  ]
+}
+```
+
+### Produtos — `/product`
 
 | Método | Rota | Descrição |
 |---|---|---|
-| GET | `/products` | Lista todos os produtos |
-| GET | `/products/{id}` | Busca produto por ID |
-| POST | `/products` | Cadastra novo produto |
+| GET | `/product` | Lista todos os produtos |
+| GET | `/product/{id}` | Busca produto por ID |
+| POST | `/product/insert` | Cadastra novo produto com categorias |
+
+### Categorias — `/category`
+
+| Método | Rota | Descrição |
+|---|---|---|
+| GET | `/category` | Lista todas as categorias |
+| GET | `/category/{id}` | Busca categoria por ID |
+| POST | `/category/insert` | Cadastra nova categoria |
+
+### Itens de Pedido — `/order-item`
+
+| Método | Rota | Descrição |
+|---|---|---|
+| GET | `/order-item` | Lista todos os itens de pedidos |
+| GET | `/order-item/order-items/{orderId}/{productId}` | Busca item por chave composta |
 
 ---
 
@@ -125,17 +162,23 @@ cd order_management_api
 ./mvnw spring-boot:run
 ```
 
-A aplicação sobe com perfil `test` usando H2 em memória — sem necessidade de banco externo. A API estará disponível em `http://localhost:8080` e o console H2 em `http://localhost:8080/h2-console`.
+A aplicação sobe com perfil `test` usando H2 em memória — sem necessidade de banco externo. A API estará disponível em `http://localhost:8080` e a documentação Swagger em `http://localhost:8080/swagger-ui/index.html`.
+
+> A rota raiz `/` redireciona automaticamente para o Swagger UI.
 
 ---
 
 ## Decisões Técnicas
 
-**H2 em dev, PostgreSQL em produção:** O projeto usa H2 em memória no perfil de testes para agilizar o desenvolvimento local sem dependência de banco externo. Em produção no Heroku, o PostgreSQL é injetado automaticamente via variável de ambiente.
+**H2 em dev, PostgreSQL em produção:** O projeto usa H2 em memória no perfil de testes para agilizar o desenvolvimento local sem dependência de banco externo. Em produção no Railway, o PostgreSQL é injetado automaticamente via variável de ambiente.
 
 **Cálculo de subtotal na entidade:** O `getSubTotal()` foi implementado como método calculado na entidade em vez de campo persistido, evitando inconsistências quando o preço do produto é atualizado após o pedido ser criado.
 
-**Composição no modelo de pedidos:** `OrderItem` é tratado como valor dentro do pedido, não como entidade independente — mantém o cálculo de total encapsulado na própria entidade `Orders`.
+**Composição no modelo de pedidos:** `OrderItem` é tratado como valor dentro do pedido usando chave primária composta (`@EmbeddedId`), mantendo o cálculo de total encapsulado na própria entidade `Orders`.
+
+**DTOs em todas as camadas:** Requests e responses usam DTOs dedicados, desacoplando a representação externa das entidades JPA e evitando expor dados sensíveis como senha.
+
+**CORS configurado:** A configuração de CORS permite origem da URL de produção no Railway, além do ambiente local.
 
 ---
 
@@ -143,5 +186,5 @@ A aplicação sobe com perfil `test` usando H2 em memória — sem necessidade d
 
 - [ ] Implementação completa dos métodos de pagamento
 - [ ] Testes de integração com Testcontainers
-- [ ] Documentação com Swagger/OpenAPI
 - [ ] Autenticação com Spring Security e JWT
+- [ ] Validação de campos com Bean Validation (`@NotBlank`, `@Email`, etc.)
