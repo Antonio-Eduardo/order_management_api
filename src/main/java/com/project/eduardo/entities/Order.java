@@ -36,9 +36,6 @@ public class Order {
     @OneToMany(mappedBy = "id.order", cascade = CascadeType.ALL)
     private Set<OrderItem> items = new HashSet<>();
 
-    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
-    private Payment payment;
-
     public OrderStatus getOrderStatus() {
         return OrderStatus.valueOf(orderStatus);
     }
