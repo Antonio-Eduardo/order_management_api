@@ -4,7 +4,7 @@
 ![Java](https://img.shields.io/badge/Java-25-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.6-brightgreen)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)
-[![Deploy](https://img.shields.io/badge/Railway-online-blueviolet)](https://ordermanagementapi-production.up.railway.app/swagger-ui/index.html)
+[![Deploy](https://img.shields.io/badge/Railway-online-blueviolet)](ordermanagementapi-production-a567.up.railway.app)
 [![Licença MIT](https://img.shields.io/badge/licenca-MIT-green)](https://github.com/Antonio-Eduardo/order_management_api/blob/master/LICENSE)
 
 > API REST para gerenciamento de usuários e controle de pedidos com cálculo automático de subtotal e total. Deploy ativo no Railway com banco PostgreSQL em produção.
