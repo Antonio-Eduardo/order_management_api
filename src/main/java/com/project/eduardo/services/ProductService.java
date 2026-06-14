@@ -56,7 +56,7 @@ public class ProductService {
         product.setName(obj.getName());
         product.setPrice(obj.getPrice());
         product.setDescription(obj.getDescription());
-        product.setImgUrl(obj.get());
+        product.setImgUrl(obj.getImgUrl());
         product.setCategories(obj.getCategories().stream().map(categoryDTOrequest -> {
             Category category = new Category();
             category.setName(categoryDTOrequest.getName());
