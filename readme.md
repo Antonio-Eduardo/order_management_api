@@ -4,12 +4,12 @@
 ![Java](https://img.shields.io/badge/Java-25-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.6-brightgreen)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)
-[![Deploy](https://img.shields.io/badge/Railway-online-blueviolet)](ordermanagementapi-production-a567.up.railway.app)
+[![Deploy](https://img.shields.io/badge/Railway-online-blueviolet)](https://ordermanagementapi-production-a567.up.railway.app/swagger-ui/index.html)
 [![Licença MIT](https://img.shields.io/badge/licenca-MIT-green)](https://github.com/Antonio-Eduardo/order_management_api/blob/master/LICENSE)
 
 > API REST para gerenciamento de usuários e controle de pedidos com cálculo automático de subtotal e total. Deploy ativo no Railway com banco PostgreSQL em produção.
 
-**[→ API em produção](https://ordermanagementapi-production.up.railway.app/swagger-ui/index.html)**
+**[→ API em produção](https://ordermanagementapi-production-a567.up.railway.app/swagger-ui/index.html)**
 
 ---
 
@@ -73,9 +73,9 @@ User (1) ──── (N) Orders (1) ──── (N) OrderItem (N) ────
 
 ## Endpoints Disponíveis
 
-> Base URL em produção: `https://ordermanagementapi-production.up.railway.app`
+> Base URL em produção: `https://ordermanagementapi-production-a567.up.railway.app`
 >
-> Documentação interativa: [/swagger-ui/index.html](https://ordermanagementapi-production.up.railway.app/swagger-ui/index.html)
+> Documentação interativa: [/swagger-ui/index.html](https://ordermanagementapi-production-a567.up.railway.app/swagger-ui/index.html)
 
 ### Usuários — `/users`
 
